@@ -1,0 +1,54 @@
+name: Android APK Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Depoyu Klonla
+      uses: actions/checkout@v4
+
+    - name: Node.js Ortamını Kur
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Java (JDK 17) Ortamını Kur
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Proje Dosyalarını Hazirla (www klasörü)
+      run: |
+        mkdir -p www
+        # index.html dosyanızın kök dizinde olduğunu varsayıyoruz:
+        cp index.html www/index.html
+
+    - name: Bağımlılıkları Yükle
+      run: npm install
+
+    - name: Capacitor Android Modülünü Ekle ve Senkronize Et
+      run: |
+        npx cap init "MetabolizmaPortali" "com.firkretkurt.metabolizma" --web-dir www --yes
+        npx cap add android
+        npx cap sync android
+
+    - name: Gradle ile Debug APK Derle
+      run: |
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug
+
+    - name: Derlenen APK Dosyasını Kaydet ve İndirilebilir Yap
+      uses: actions/upload-artifact@v4
+      with:
+        name: metabolizma-debug-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
