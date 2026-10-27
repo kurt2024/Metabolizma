@@ -18,7 +18,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
 
     - name: Java (JDK 17) Ortamını Kur
       uses: actions/setup-java@v4
@@ -26,14 +25,19 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Proje Dosyalarını Hazirla (www klasörü)
+    - name: Proje Dosyalarını Kontrol Et ve Hazirla
       run: |
+        echo "Mevcut dosya yapısı:"
+        ls -la
+        # Eğer www klasörü yoksa oluştur ve index.html'i taşı
         mkdir -p www
-        # index.html dosyanızın kök dizinde olduğunu varsayıyoruz:
-        cp index.html www/index.html
+        if [ -f index.html ]; then
+          cp index.html www/index.html
+        fi
+        ls -la www
 
     - name: Bağımlılıkları Yükle
-      run: npm install
+      run: npm install --legacy-peer-deps
 
     - name: Capacitor Android Modülünü Ekle ve Senkronize Et
       run: |
