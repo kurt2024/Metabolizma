@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hücresel Metabolizma Yörünge Portalı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500;700&display=swap');
+
+        :root {
+            --bg-dark: #0a0e14;
+            --cho-color: #3b82f6; /* Mavi */
+            --pro-color: #d946ef; /* Magenta/Mor */
+            --fat-color: #f97316; /* Turuncu */
+            --tca-color: #10b981; /* Zümrüt Yeşili */
+            --carn-color: #ef4444; /* Kırmızı */
+            --lipo-color: #eab308; /* Sarı */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 0%, #151b26 0%, var(--bg-dark) 100%);
+            color: #e5e7eb;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, .font-orbitron { font-family: 'Orbitron', sans-serif; }
+
+        /* --- View Transitions --- */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            flex-grow: 1;
+            width: 100%;
+        }
+        .view-section.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* =========================================
+           YENİ: ORBİTAL (DAİRESEL) MENÜ TASARIMI 
+           ========================================= */
+        #orbital-container {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+            #orbital-container { max-width: 550px; }
+        }
+
+        /* Merkez Hub (Metabolizma Merkezi) */
+        .center-hub {
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1e293b, #0f172a);
+            border: 2px solid #334155;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10;
+            box-shadow: 0 0 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.05);
+            animation: hubPulse 3s infinite alternate ease-in-out;
+        }
+        @media (min-width: 768px) {
+            .center-hub { width: 140px; height: 140px; }
+        }
+        @keyframes hubPulse {
+            0% { box-shadow: 0 0 20px rgba(14, 165, 233, 0.2); border-color: #334155; transform: translate(-50%, -50%) scale(1); }
+            100% { box-shadow: 0 0 45px rgba(14, 165, 233, 0.6); border-color: #0ea5e9; transform: translate(-50%, -50%) scale(1.03); }
+        }
+        .hub-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.2;
+            text-align: center;
+        }
+        @media (min-width: 768px) { .hub-title { font-size: 0.8rem; } }
+
+        /* Yörünge İstasyonları (Modüller) */
+        .orbit-node {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 75px; height: 75px;
+            border-radius: 50%;
+            background: #111827;
+            border: 2px solid;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+        }
+        @media (min-width: 768px) {
+            .orbit-node { width: 95px; height: 95px; }
+        }
+        .node-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.55rem;
+            font-weight: bold;
+            margin-top: 4px;
+            color: #d1d5db;
+            text-align: center;
+            line-height: 1.1;
+        }
+        @media (min-width: 768px) { .node-title { font-size: 0.7rem; } }
+
+        /* Yörünge İstasyonları Renk & Hover Efektleri */
+        .node-cho { border-color: var(--cho-color); }
+        .node-cho:hover { box-shadow: 0 0 25px var(--cho-color), inset 0 0 10px var(--cho-color); background: rgba(59, 130, 246, 0.15); transform: translate(-50%, -50%) scale(1.15); }
+        .node-cho .node-title { color: var(--cho-color); }
+
+        .node-tca { border-color: var(--tca-color); }
+        .node-tca:hover { box-shadow: 0 0 25px var(--tca-color), inset 0 0 10px var(--tca-color); background: rgba(16, 185, 129, 0.15); transform: translate(-50%, -50%) scale(1.15); }
+        .node-tca .node-title { color: var(--tca-color); }
+
+        .node-aa { border-color: var(--pro-color); }
+        .node-aa:hover { box-shadow: 0 0 25px var(--pro-color), inset 0 0 10px var(--pro-color); background: rgba(217, 70, 239, 0.15); transform: translate(-50%, -50%) scale(1.15); }
+        .node-aa .node-title { color: var(--pro-color); }
+
+        .node-carn { border-color: var(--carn-color); }
+        .node-carn:hover { box-shadow: 0 0 25px var(--carn-color), inset 0 0 10px var(--carn-color); background: rgba(239, 68, 68, 0.15); transform: translate(-50%, -50%) scale(1.15); }
+        .node-carn .node-title { color: var(--carn-color); }
+
+        .node-lipo { border-color: var(--lipo-color); }
+        .node-lipo:hover { box-shadow: 0 0 25px var(--lipo-color), inset 0 0 10px var(--lipo-color); background: rgba(234, 179, 8, 0.15); transform: translate(-50%, -50%) scale(1.15); }
+        .node-lipo .node-title { color: var(--lipo-color); }
+
+        /* --- UI Components --- */
+        .info-panel-glass {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid #334155;
+            border-radius: 16px;
+        }
+
+        .reactor-circle {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background: #0f141e;
+            border: 4px solid #374151;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.4s ease;
+            z-index: 10;
+        }
+        @media (min-width: 640px) { .reactor-circle { width: 260px; height: 260px; } }
+        
+        .neon-pulse { animation: pulseAnim 2s infinite alternate; }
+        @keyframes pulseAnim { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+
+        /* --- TCA Circular View --- */
+        #tca-container { position: relative; width: 100%; max-width: 450px; aspect-ratio: 1/1; margin: 0 auto; }
+        .tca-node {
+            position: absolute; transform: translate(-50%, -50%);
+            width: 70px; height: 70px; border-radius: 50%;
+            background: #111827; border: 2px solid #374151;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; transition: all 0.4s ease; z-index: 10;
+        }
+        .tca-node.active {
+            border-color: var(--tca-color); background: #064e3b;
+            box-shadow: 0 0 25px var(--tca-color); transform: translate(-50%, -50%) scale(1.2); z-index: 20;
+        }
+        .tca-node.completed { border-color: #4b5563; opacity: 0.5; }
+
+        /* --- Particle System --- */
+        .particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; }
+        .floating-text {
+            position: fixed; font-family: 'Orbitron', sans-serif; font-weight: 900;
+            pointer-events: none; z-index: 10000; text-shadow: 0 0 10px currentColor;
+        }
+
+        /* --- Toggles --- */
+        .toggle-btn {
+            padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;
+            transition: all 0.3s; border: 1px solid #4b5563; color: #9ca3af;
+        }
+        .toggle-btn.active { color: #fff; border-color: currentColor; box-shadow: 0 0 15px currentColor; }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- HEADER -->
+    <header class="w-full max-w-5xl mx-auto flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 drop-shadow-md tracking-wider font-orbitron">
+                META-YÖRÜNGE
+            </h1>
+            <p class="text-xs text-gray-400 mt-1">İleri Düzey Hücresel Metabolizma</p>
+        </div>
+        <button id="nav-home" onclick="switchView('dashboard')" class="hidden px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-semibold transition-colors border border-gray-600 shadow-lg flex items-center gap-2">
+            <span>⌂</span> Merkeze Dön
+        </button>
+    </header>
+
+    <!-- VIEW: YÖRÜNGESEL DASHBOARD -->
+    <main id="view-dashboard" class="view-section active flex-col items-center justify-center max-w-5xl mx-auto w-full">
+        
+        <div class="text-center mb-6 md:mb-10">
+            <h2 class="text-2xl md:text-3xl font-bold font-orbitron text-gray-200">Sistemi Seçin</h2>
+            <p class="text-[0.7rem] md:text-sm text-gray-400 mt-2">İlgili metabolik yolağa gitmek için yörüngedeki istasyonlara tıklayın.</p>
+        </div>
+
+        <div id="orbital-container">
+            <!-- Bağlantı Çizgileri (SVG) -->
+            <svg class="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+                <!-- Node 1 (Top) -->
+                <line x1="50%" y1="50%" x2="50%" y2="12%" stroke="#374151" stroke-width="2" stroke-dasharray="4" />
+                <!-- Node 2 (Right-Top) -->
+                <line x1="50%" y1="50%" x2="86.1%" y2="38.2%" stroke="#374151" stroke-width="2" stroke-dasharray="4" />
+                <!-- Node 3 (Right-Bottom) -->
+                <line x1="50%" y1="50%" x2="72.3%" y2="80.7%" stroke="#374151" stroke-width="2" stroke-dasharray="4" />
+                <!-- Node 4 (Left-Bottom) -->
+                <line x1="50%" y1="50%" x2="27.7%" y2="80.7%" stroke="#374151" stroke-width="2" stroke-dasharray="4" />
+                <!-- Node 5 (Left-Top) -->
+                <line x1="50%" y1="50%" x2="13.9%" y2="38.2%" stroke="#374151" stroke-width="2" stroke-dasharray="4" />
+                
+                <!-- Opsiyonel: Zayıf Dış Yörünge Çizgisi -->
+                <circle cx="50%" cy="50%" r="38%" fill="none" stroke="#1f2937" stroke-width="1" stroke-dasharray="4 8" />
+            </svg>
+
+            <!-- Merkez Hub -->
+            <div class="center-hub">
+                <div class="text-3xl md:text-4xl mb-1 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🌌</div>
+                <div class="hub-title">Metabolizma<br>Merkezi</div>
+            </div>
+
+            <!-- Yörünge İstasyonları (Trigonometrik Yüzdelerle Kusursuz Çember Dizilimi) -->
+            
+            <!-- 1. Makro Sindirimi (-90 derece) -->
+            <div class="orbit-node node-cho" style="left: 50%; top: 12%;" onclick="openMacroView()">
+                <div class="text-2xl md:text-3xl mb-1 drop-shadow-md">🍞</div>
+                <div class="node-title">1. Sindirim</div>
+            </div>
+            
+            <!-- 2. TCA Döngüsü (-18 derece) -->
+            <div class="orbit-node node-tca" style="left: 86.1%; top: 38.2%;" onclick="openTcaView()">
+                <div class="text-2xl md:text-3xl mb-1 drop-shadow-md">♻️</div>
+                <div class="node-title">2. TCA</div>
+            </div>
+
+            <!-- 3. Aminoasit Havuzu (54 derece) -->
+            <div class="orbit-node node-aa" style="left: 72.3%; top: 80.7%;" onclick="openGenericView('aa')">
+                <div class="text-2xl md:text-3xl mb-1 drop-shadow-md">🫀</div>
+                <div class="node-title">3. AA Havuzu</div>
+            </div>
+
+            <!-- 4. Karnitin Mekiği (126 derece) -->
+            <div class="orbit-node node-carn" style="left: 27.7%; top: 80.7%;" onclick="openGenericView('carn')">
+                <div class="text-2xl md:text-3xl mb-1 drop-shadow-md">🚪</div>
+                <div class="node-title">4. Karnitin</div>
+            </div>
+
+            <!-- 5. Lipogenez/Lipoliz (198 derece) -->
+            <div class="orbit-node node-lipo" style="left: 13.9%; top: 38.2%;" onclick="openFatMetabolismView()">
+                <div class="text-2xl md:text-3xl mb-1 drop-shadow-md">⚖️</div>
+                <div class="node-title">5. Lipitler</div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- VIEW: MACRO (Modül 1) -->
+    <main id="view-macro" class="view-section flex-col items-center justify-start max-w-2xl mx-auto w-full">
+        <div class="flex gap-2 mb-4">
+            <button class="px-4 py-2 rounded bg-gray-800 text-blue-400 text-sm font-bold border border-blue-900 focus:bg-blue-900 transition-colors" onclick="startLinearPathway('macro', 'cho')">Karbonhidrat</button>
+            <button class="px-4 py-2 rounded bg-gray-800 text-fuchsia-400 text-sm font-bold border border-fuchsia-900 focus:bg-fuchsia-900 transition-colors" onclick="startLinearPathway('macro', 'pro')">Protein</button>
+            <button class="px-4 py-2 rounded bg-gray-800 text-orange-400 text-sm font-bold border border-orange-900 focus:bg-orange-900 transition-colors" onclick="startLinearPathway('macro', 'fat')">Yağ</button>
+        </div>
+        <!-- Reusable Linear UI injected via JS -->
+        <div id="macro-ui-container" class="w-full flex flex-col items-center"></div>
+    </main>
+
+    <!-- VIEW: GENERIC LINEAR (Modül 3 ve 4 için) -->
+    <main id="view-generic" class="view-section flex-col items-center justify-start max-w-2xl mx-auto w-full">
+        <h2 id="gen-title" class="text-xl md:text-2xl font-bold font-orbitron mb-4 text-center"></h2>
+        <div id="gen-ui-container" class="w-full flex flex-col items-center"></div>
+    </main>
+
+    <!-- VIEW: FAT METABOLISM (Modül 5) -->
+    <main id="view-fatmetab" class="view-section flex-col items-center justify-start max-w-2xl mx-auto w-full">
+        <div class="flex gap-4 mb-4 bg-gray-800 p-1 rounded-lg">
+            <div id="btn-lipogenez" class="toggle-btn active" style="color: #3b82f6" onclick="startLinearPathway('fatmetab', 'lipogenez')">Lipogenez (Yapım)</div>
+            <div id="btn-lipoliz" class="toggle-btn" style="color: #9ca3af" onclick="startLinearPathway('fatmetab', 'lipoliz')">Lipoliz (Yıkım)</div>
+        </div>
+        <div id="fatmetab-ui-container" class="w-full flex flex-col items-center"></div>
+    </main>
+
+    <!-- VIEW: TCA CYCLE (Modül 2) -->
+    <main id="view-tca" class="view-section flex-col items-center justify-start max-w-3xl mx-auto w-full">
+        <h2 class="text-2xl font-bold font-orbitron text-emerald-400 mb-6 drop-shadow-md">TCA Reaktörü</h2>
+        <div id="tca-container">
+            <div id="tca-center-panel" class="info-panel-glass p-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[55%] h-[55%] rounded-full flex flex-col items-center justify-center text-center z-0">
+                <div id="tca-info" class="w-full flex flex-col items-center">
+                    <span id="tca-enz" class="text-[0.65rem] md:text-xs text-emerald-400 italic bg-emerald-950 px-2 py-1 rounded-full border border-emerald-800 mb-2"></span>
+                    <p id="tca-desc" class="text-[0.65rem] md:text-xs text-gray-200 leading-tight"></p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-8 flex flex-col items-center w-full">
+            <button id="tca-next-btn" onclick="nextTCAStep()" class="px-8 py-3 rounded-full font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all active:scale-95 text-lg">
+                Döngüyü Başlat
+            </button>
+            <div id="tca-progress" class="text-xs text-emerald-700 font-bold uppercase tracking-widest mt-4">Aşama: 0 / 8</div>
+        </div>
+    </main>
+
+    <!-- UI TEMPLATE (Hidden) for Linear Modules -->
+    <template id="linear-ui-template">
+        <div class="reactor-circle neon-pulse">
+            <div class="rc-icon text-5xl md:text-6xl mb-2 drop-shadow-md">⚙️</div>
+            <div class="rc-name font-orbitron font-bold text-lg md:text-xl px-4 leading-tight">Yükleniyor</div>
+            <div class="rc-sub text-[0.65rem] text-gray-400 mt-2 uppercase tracking-widest px-2"></div>
+        </div>
+        <div class="info-panel-glass w-full p-5 mt-6 text-center">
+            <div class="flex justify-center items-center gap-2 mb-3">
+                <span class="rc-loc text-[0.65rem] font-bold uppercase px-2 py-1 rounded bg-gray-800 text-gray-300">Konum</span>
+                <span class="rc-enz text-[0.65rem] font-bold uppercase px-2 py-1 rounded border">Enzim/Süreç</span>
+            </div>
+            <p class="rc-desc text-sm md:text-base text-gray-200 leading-relaxed min-h-[50px]"></p>
+        </div>
+        <div class="mt-6 flex flex-col items-center w-full">
+            <button class="rc-btn px-8 py-3 rounded-full font-bold text-white transition-all transform active:scale-95 text-lg shadow-lg">Başlat</button>
+            <div class="rc-progress text-xs text-gray-500 font-bold uppercase tracking-widest mt-4"></div>
+        </div>
+    </template>
+
+    <script>
+        // --- DATA DICTIONARY (Simülasyon Veritabanı) ---
+
+        // 1. Makro Sindirimi
+        const macroData = {
+            cho: { color: "var(--cho-color)", steps: [
+                { icon: "🌾", name: "Nişasta", sub: "Polisakkarit", loc: "Ağız", enz: "Tükürük Amilazı", desc: "Karbonhidrat sindirimi ağızda başlar. Amilaz enzimi bağları koparır.", yields: [] },
+                { icon: "⚡", name: "Pirüvat (3C)", sub: "Glikoliz", loc: "Sitoplazma", enz: "Fosfofruktokinaz", desc: "Glikoz sitoplazmada yıkılır. ATP ve NADH kazanılır.", yields: [{ text: "+ATP", color: "#10b981"}, { text: "+NADH", color: "#eab308"}] },
+                { icon: "🔥", name: "Asetil-CoA (2C)", sub: "Geçiş", loc: "Mitokondri", enz: "PDH Kompleksi", desc: "Pirüvat, TCA döngüsüne girmek için Asetil-CoA'ya dönüştürülür.", yields: [{ text: "+Asetil-CoA", color: "#facc15"}, { text: "+CO2", color: "#9ca3af"}] }
+            ]},
+            pro: { color: "var(--pro-color)", steps: [
+                { icon: "♨️", name: "Polipeptit", sub: "Denatürasyon", loc: "Mide", enz: "Pepsin + HCl", desc: "Mide asidi proteini açar, Pepsin enzimi uzun zincirleri peptitlere böler.", yields: [] },
+                { icon: "✂️", name: "Keto Asit", sub: "Deaminasyon", loc: "Karaciğer", enz: "Deaminaz", desc: "Enerji üretimi için amino asitlerin 'Azot' grubu kesilir.", yields: [{ text: "+Amonyak", color: "#ef4444"}] },
+                { icon: "♻️", name: "Asetil-CoA", sub: "Enerjiye Dönüşüm", loc: "Mitokondri", enz: "Üre Döngüsü", desc: "Amonyak üreye çevrilirken, karbon iskeleti Asetil-CoA'ya dönüşür.", yields: [{ text: "+Asetil-CoA", color: "#facc15"}, { text: "+Üre", color: "#f472b6"}] }
+            ]},
+            fat: { color: "var(--fat-color)", steps: [
+                { icon: "🫧", name: "Yağ Damlası", sub: "Emülsifikasyon", loc: "Bağırsak", enz: "Safra", desc: "Safra tuzları dev yağ damlalarını küçük misellere parçalar.", yields: [{ text: "+Safra", color: "#22c55e"}] },
+                { icon: "💧", name: "Şilomikron", sub: "Emilim ve Taşıma", loc: "Kan/Lenf", enz: "Lipoprotein Lipaz", desc: "Yağ asitleri dokulara lipoproteinler aracılığıyla taşınır.", yields: [] },
+                { icon: "☄️", name: "Asetil-CoA", sub: "Beta-Oksidasyon", loc: "Mitokondri", enz: "Oksidazlar", desc: "Yağ asitleri devasa enerji vererek Asetil-CoA birimlerine ayrılır.", yields: [{ text: "+Asetil-CoA", color: "#facc15"}, { text: "+NADH", color: "#eab308"}, { text: "+FADH2", color: "#3b82f6"}] }
+            ]}
+        };
+
+        // 2. Aminoasit Havuzu
+        const aaData = { color: "var(--pro-color)", title: "Aminoasit Havuzu (Dinamik Denge)", steps: [
+            { icon: "🥩", name: "Diyet & Kas Yıkımı", sub: "Girdi (Input)", loc: "Sistemik Dolaşım", enz: "Proteazlar", desc: "Yenilen proteinler ve hücresel yaşlanma/açlık sonucu yıkılan kas proteinleri kana karışır.", yields: [{text: "+Aminoasit", color: "#d946ef"}] },
+            { icon: "🫀", name: "Serbest AA Havuzu", sub: "Merkez", loc: "Hücre İçi & Kan", enz: "Dinamik Denge", desc: "Vücutta depolanmayan aminoasitler sürekli bir sirkülasyon havuzunda bekler.", yields: [] },
+            { icon: "🧬", name: "Doku Sentezi", sub: "Çıktı 1 (Anabolizma)", loc: "Ribozom", enz: "Translasyon", desc: "Havuzdaki AA'lar yeni kas dokusu, enzim, antikor veya hormon yapmak için kullanılır.", yields: [{text: "-AA Tüketimi", color: "#10b981"}, {text: "-ATP", color: "#ef4444"}] },
+            { icon: "🔥", name: "Enerji & Üre", sub: "Çıktı 2 (Katabolizma)", loc: "Karaciğer", enz: "Transaminasyon", desc: "Fazla AA'ların nitrojeni Üre olarak atılır, kalan iskelet enerji (Glikoz/Keton/ATP) için yakılır.", yields: [{text: "+Üre", color: "#f472b6"}, {text: "+Enerji", color: "#eab308"}] }
+        ]};
+
+        // 3. Karnitin Mekiği
+        const carnData = { color: "var(--carn-color)", title: "Karnitin Mekiği Transferi", steps: [
+            { icon: "🔋", name: "Yağ Asidi Aktivasyonu", sub: "Hazırlık", loc: "Sitoplazma", enz: "Açil-CoA Sentetaz", desc: "Serbest yağ asidine Koenzim-A eklenerek 'Açil-CoA' oluşturulur (ATP harcanır).", yields: [{text: "-ATP", color: "#ef4444"}, {text: "+Açil-CoA", color: "#facc15"}] },
+            { icon: "🚪", name: "CPT-1", sub: "Mekiğe Biniş", loc: "Dış Mitokondri Zarı", enz: "Karnitin Palmitoiltransferaz-1", desc: "Açil grubu Karnitin'e aktarılır. Bu adım yağ yakımının HIZ KISITLAYICI basamağıdır.", yields: [{text: "+Açil-Karnitin", color: "#f97316"}] },
+            { icon: "↔️", name: "Translokasyon", sub: "Zardan Geçiş", loc: "İç Mitokondri Zarı", enz: "Translokaz", desc: "Açil-Karnitin içeri girerken, içerideki boş Karnitin dışarı çıkar (Antiport).", yields: [] },
+            { icon: "🔥", name: "CPT-2", sub: "Hedefe Varış", loc: "Mitokondri Matriksi", enz: "Karnitin Palmitoiltransferaz-2", desc: "Açil grubu tekrar CoA'ya verilir. Karnitin serbest kalır. Yağ asidi artık Beta-Oksidasyona hazırdır!", yields: [{text: "+Matriks Açil-CoA", color: "#facc15"}, {text: "Karnitin Döndü", color: "#ef4444"}] }
+        ]};
+
+        // 4. Yağ Metabolizması (Lipogenez vs Lipoliz)
+        const fatmetabData = {
+            lipogenez: { color: "#3b82f6", steps: [ // Mavi
+                { icon: "🍬", name: "Karbonhidrat Fazlası", sub: "Glikoliz Kaynağı", loc: "Sitoplazma", enz: "Fosfofruktokinaz", desc: "Fazla şeker yendiğinde glikolizden 'Gliserol-3-Fosfat' (omurga) oluşur.", yields: [{text: "+G-3-P", color: "#3b82f6"}] },
+                { icon: "🔗", name: "Açil-CoA Eklenmesi", sub: "Esterifikasyon", loc: "Endoplazmik Retikulum", enz: "Açiltransferazlar", desc: "Gliserol omurgasına 3 adet yağ asidi (Açil-CoA) sırayla eklenir.", yields: [{text: "-Açil-CoA", color: "#facc15"}] },
+                { icon: "🧈", name: "Trigliserit (TAG)", sub: "Depolanma", loc: "Adiposit (Yağ Hücresi)", enz: "Sentez Tamamlandı", desc: "Yeni üretilen yağ (TAG), adipositlerde devasa damlacıklar halinde depolanır. Kilo alımı gerçekleşir.", yields: [{text: "+Yağ Deposu", color: "#10b981"}] }
+            ]},
+            lipoliz: { color: "#f97316", steps: [ // Turuncu
+                { icon: "✂️", name: "ATGL Etkisi", sub: "İlk Yıkım", loc: "Yağ Damlası Yüzeyi", enz: "ATGL", desc: "Açlık veya egzersizde Adipoz Trigliserit Lipaz (ATGL), TAG'dan ilk yağ asidini koparır.", yields: [{text: "+1 Yağ Asidi", color: "#facc15"}, {text: "+DAG", color: "#f97316"}] },
+                { icon: "🔥", name: "HSL Etkisi", sub: "İkinci Yıkım", loc: "Sitoplazma", enz: "Hormona Duyarlı Lipaz", desc: "HSL (Adrenalin ile aktifleşir), DAG'ı parçalayarak ikinci yağ asidini serbest bırakır.", yields: [{text: "+1 Yağ Asidi", color: "#facc15"}, {text: "+MAG", color: "#f97316"}] },
+                { icon: "🚀", name: "Kana Karışma", sub: "Sonuç", loc: "Kan Dolaşımı", enz: "MGL (Monogliserit Lipaz)", desc: "Son yağ asidi de koparılır. Ortaya çıkan 3 serbest yağ asidi ve Gliserol kana verilip dokulara yakılmaya gider.", yields: [{text: "+3 Serbest YA", color: "#facc15"}, {text: "+Gliserol", color: "#3b82f6"}] }
+            ]}
+        };
+
+        // 5. TCA
+        const tcaData = [
+            { name: "Sitrat", enz: "Sitrat Sentaz", desc: "Asetil-CoA (2C), Oksaloasetat (4C) ile birleşir.", yields: [] },
+            { name: "İzositrat", enz: "Akonitaz", desc: "Sitrat izomerize olur.", yields: [] },
+            { name: "α-Ketoglutarat", enz: "İzositrat Dehidrog.", desc: "İlk CO2 atımı ve NADH eldesi.", yields: [{ text: "+NADH", color: "#eab308" }, { text: "+CO2", color: "#9ca3af" }] },
+            { name: "Süksinil-CoA", enz: "α-KG Dehidrog.", desc: "İkinci CO2 atımı ve NADH.", yields: [{ text: "+NADH", color: "#eab308" }, { text: "+CO2", color: "#9ca3af" }] },
+            { name: "Süksinat", enz: "Süksinil-CoA Sentetaz", desc: "Substrat düzeyinde ATP üretimi.", yields: [{ text: "+ATP", color: "#10b981" }] },
+            { name: "Fumarat", enz: "Süksinat Dehidrog.", desc: "FADH2 üretilir.", yields: [{ text: "+FADH2", color: "#3b82f6" }] },
+            { name: "Malat", enz: "Fumaraz", desc: "Su eklenerek yapı düzenlenir.", yields: [] },
+            { name: "Oksaloasetat", enz: "Malat Dehidrog.", desc: "Döngü tamamlanır, son NADH alınır.", yields: [{ text: "+NADH", color: "#eab308" }] }
+        ];
+
+        // --- STATE & ROUTING ---
+        let currentView = 'dashboard';
+        
+        let activeLinearData = null;
+        let linearStepIdx = -1;
+        let currentLinearContainerId = null;
+
+        let tcaStepIdx = -1;
+        let tcaNodes = [];
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            const navHome = document.getElementById('nav-home');
+            viewId === 'dashboard' ? navHome.classList.add('hidden') : navHome.classList.remove('hidden');
+            currentView = viewId;
+        }
+
+        // --- MODULE ROUTERS ---
+
+        function openMacroView() {
+            switchView('macro');
+            startLinearPathway('macro', 'cho'); 
+        }
+
+        function openGenericView(type) {
+            switchView('generic');
+            const data = type === 'aa' ? aaData : carnData;
+            document.getElementById('gen-title').innerText = data.title;
+            document.getElementById('gen-title').style.color = data.color;
+            setupLinearUI('gen-ui-container', data, data.color);
+        }
+
+        function openFatMetabolismView() {
+            switchView('fatmetab');
+            startLinearPathway('fatmetab', 'lipogenez');
+        }
+
+        function openTcaView() {
+            switchView('tca');
+            if(tcaNodes.length === 0) initTCANodes();
+            resetTCA();
+        }
+
+        // --- LINEAR UI CONTROLLER ---
+        
+        function startLinearPathway(viewCtx, subtype) {
+            let dataObj, containerId, color;
+            
+            if(viewCtx === 'macro') {
+                dataObj = macroData[subtype];
+                color = dataObj.color;
+                containerId = 'macro-ui-container';
+            } else if (viewCtx === 'fatmetab') {
+                dataObj = { steps: fatmetabData[subtype].steps };
+                color = fatmetabData[subtype].color;
+                containerId = 'fatmetab-ui-container';
+                
+                // Toggle Buttons UX
+                document.getElementById('btn-lipogenez').className = `toggle-btn ${subtype === 'lipogenez' ? 'active' : ''}`;
+                document.getElementById('btn-lipogenez').style.color = subtype === 'lipogenez' ? color : '#9ca3af';
+                
+                document.getElementById('btn-lipoliz').className = `toggle-btn ${subtype === 'lipoliz' ? 'active' : ''}`;
+                document.getElementById('btn-lipoliz').style.color = subtype === 'lipoliz' ? color : '#9ca3af';
+            }
+
+            setupLinearUI(containerId, dataObj, color);
+        }
+
+        function setupLinearUI(containerId, dataObj, color) {
+            currentLinearContainerId = containerId;
+            activeLinearData = dataObj;
+            linearStepIdx = -1;
+
+            const container = document.getElementById(containerId);
+            container.innerHTML = document.getElementById('linear-ui-template').innerHTML;
+
+            const box = container.querySelector('.reactor-circle');
+            box.style.borderColor = color;
+            box.style.boxShadow = `0 0 20px ${color}66, inset 0 0 10px ${color}33`;
+            
+            container.querySelector('.rc-name').style.color = color;
+            container.querySelector('.rc-loc').innerText = "Bekleniyor";
+            container.querySelector('.rc-enz').style.borderColor = "#374151";
+            
+            const btn = container.querySelector('.rc-btn');
+            btn.style.backgroundColor = color;
+            btn.style.boxShadow = `0 0 15px ${color}88`;
+            btn.onclick = nextLinearStep;
+            
+            container.querySelector('.rc-progress').innerText = `Aşama: 0 / ${dataObj.steps.length}`;
+        }
+
+        function nextLinearStep() {
+            if (linearStepIdx >= activeLinearData.steps.length - 1) {
+                // Sona gelince döngüyü sıfırla
+                linearStepIdx = -1;
+                setupLinearUI(currentLinearContainerId, activeLinearData, activeLinearData.color || (activeLinearData.steps === fatmetabData.lipoliz.steps ? "#f97316" : "#3b82f6"));
+                return;
+            }
+
+            linearStepIdx++;
+            const step = activeLinearData.steps[linearStepIdx];
+            const container = document.getElementById(currentLinearContainerId);
+            const box = container.querySelector('.reactor-circle');
+            const color = activeLinearData.color || (activeLinearData.steps === fatmetabData.lipoliz.steps ? "#f97316" : "#3b82f6");
+
+            // Kutu Küçülme Efekti
+            box.style.transform = "scale(0.85)";
+            
+            setTimeout(() => {
+                container.querySelector('.rc-icon').innerText = step.icon;
+                container.querySelector('.rc-name').innerText = step.name;
+                container.querySelector('.rc-sub').innerText = step.sub;
+                
+                container.querySelector('.rc-loc').innerText = step.loc;
+                const enzEl = container.querySelector('.rc-enz');
+                enzEl.innerText = step.enz;
+                enzEl.style.color = color;
+                enzEl.style.borderColor = color;
+                enzEl.style.backgroundColor = color + "1a"; 
+                
+                container.querySelector('.rc-desc').innerText = step.desc;
+                container.querySelector('.rc-progress').innerText = `Aşama: ${linearStepIdx + 1} / ${activeLinearData.steps.length}`;
+                
+                const btn = container.querySelector('.rc-btn');
+                btn.innerText = (linearStepIdx === activeLinearData.steps.length - 1) ? "Sistemi Sıfırla" : "Sonraki Aşama ➔";
+
+                box.style.transform = "scale(1)";
+
+                const yields = step.yields.length > 0 ? step.yields : [{text: "Dönüşüm", color: "#ffffff"}];
+                triggerExplosion(box, yields);
+                
+            }, 300);
+        }
+
+
+        // --- TCA CONTROLLER ---
+
+        function initTCANodes() {
+            const container = document.getElementById('tca-container');
+            const total = tcaData.length;
+            const radius = 42; 
+            const startAngle = -45;
+
+            tcaData.forEach((step, index) => {
+                const angle = startAngle + (index * (360 / total));
+                const radian = angle * (Math.PI / 180);
+                const left = 50 + (Math.cos(radian) * radius);
+                const top = 50 + (Math.sin(radian) * radius);
+
+                const nodeEl = document.createElement('div');
+                nodeEl.className = 'tca-node';
+                nodeEl.style.left = `${left}%`;
+                nodeEl.style.top = `${top}%`;
+                nodeEl.innerHTML = `<div class="text-[0.6rem] md:text-[0.7rem] font-bold font-orbitron">${step.name}</div>`;
+                container.appendChild(nodeEl);
+                tcaNodes.push(nodeEl);
+            });
+        }
+
+        function resetTCA() {
+            tcaStepIdx = -1;
+            tcaNodes.forEach(n => n.classList.remove('active', 'completed'));
+            tcaNodes[7].style.borderColor = "#4b5563"; // Oksaloasetat bekliyor
+            
+            document.getElementById('tca-info').classList.add('hidden');
+            document.getElementById('tca-next-btn').innerText = "Döngüyü Başlat";
+            document.getElementById('tca-progress').innerText = "Aşama: 0 / 8";
+        }
+
+        function nextTCAStep() {
+            if (tcaStepIdx >= tcaData.length - 1) { resetTCA(); return; }
+
+            if (tcaStepIdx === -1) {
+                document.getElementById('tca-info').classList.remove('hidden');
+            }
+
+            tcaStepIdx++;
+            const step = tcaData[tcaStepIdx];
+
+            tcaNodes.forEach((n, i) => {
+                n.classList.remove('active');
+                if (i < tcaStepIdx) n.classList.add('completed');
+            });
+            
+            const activeNode = tcaNodes[tcaStepIdx];
+            activeNode.classList.remove('completed');
+            activeNode.classList.add('active');
+
+            document.getElementById('tca-enz').innerText = step.enz;
+            document.getElementById('tca-desc').innerText = step.desc;
+            document.getElementById('tca-next-btn').innerText = "Sonraki Aşama ➔";
+            document.getElementById('tca-progress').innerText = `Aşama: ${tcaStepIdx + 1} / 8`;
+
+            if (step.yields.length > 0) triggerExplosion(activeNode, step.yields);
+        }
+
+        // --- PARTICLE ENGINE ---
+        
+        function triggerExplosion(element, yields) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            yields.forEach((yieldItem, index) => {
+                createFloatingText(yieldItem.text, yieldItem.color, centerX, centerY, index, yields.length);
+                for (let i = 0; i < 12; i++) {
+                    createParticle(yieldItem.color, centerX, centerY);
+                }
+            });
+        }
+
+        function createFloatingText(text, color, x, y, index, total) {
+            const el = document.createElement('div');
+            el.className = 'floating-text text-sm md:text-lg';
+            el.innerText = text;
+            el.style.color = color;
+            el.style.left = `${x}px`; el.style.top = `${y}px`;
+            
+            let angle;
+            if (total === 1) angle = -90 + (Math.random() * 30 - 15); 
+            else if (total === 2) angle = index === 0 ? -135 : -45; 
+            else angle = -180 + (index * (180 / (total - 1))); 
+            
+            const rad = angle * (Math.PI / 180);
+            const dist = 90 + Math.random() * 40;
+            const destX = Math.cos(rad) * dist;
+            const destY = Math.sin(rad) * dist - 20; 
+
+            document.body.appendChild(el);
+
+            const anim = el.animate([
+                { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1.3)', opacity: 1, offset: 0.2 },
+                { transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0.8)`, opacity: 0 }
+            ], { duration: 1800, easing: 'cubic-bezier(0.2, 0.9, 0.5, 1)' });
+
+            anim.onfinish = () => el.remove();
+        }
+
+        function createParticle(color, x, y) {
+            const el = document.createElement('div');
+            el.className = 'particle';
+            const size = Math.random() * 4 + 3;
+            el.style.width = `${size}px`; el.style.height = `${size}px`;
+            el.style.backgroundColor = color;
+            el.style.boxShadow = `0 0 ${size*2}px ${color}`;
+            el.style.left = `${x}px`; el.style.top = `${y}px`;
+
+            document.body.appendChild(el);
+
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 70 + 40; 
+            const destX = Math.cos(angle) * velocity;
+            const destY = Math.sin(angle) * velocity;
+
+            const anim = el.animate([
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                { transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0)`, opacity: 0 }
+            ], { duration: 700 + Math.random() * 600, easing: 'ease-out' });
+
+            anim.onfinish = () => el.remove();
+        }
+
+    </script>
+</body>
+</html>
