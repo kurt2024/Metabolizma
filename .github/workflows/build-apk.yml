@@ -29,7 +29,6 @@ jobs:
       run: |
         echo "Mevcut dosya yapısı:"
         ls -la
-        # Eğer www klasörü yoksa oluştur ve index.html'i taşı
         mkdir -p www
         if [ -f index.html ]; then
           cp index.html www/index.html
@@ -41,7 +40,7 @@ jobs:
 
     - name: Capacitor Android Modülünü Ekle ve Senkronize Et
       run: |
-        npx cap init "MetabolizmaPortali" "com.firkretkurt.metabolizma" --web-dir www --yes
+        # capacitor.config.json dosyasını okuyarak başlatır ve android platformunu ekler
         npx cap add android
         npx cap sync android
 
