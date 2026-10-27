@@ -1,0 +1,9 @@
+{
+  "appId": "com.firkretkurt.metabolizma",
+  "appName": "Metabolizma Portali",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "backgroundColor": "#0b0f19"
+  }
+}
